@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const BranchCard = ({ item, headerColorClass }) => {
+  const [showAddress, setShowAddress] = useState(false);
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow">
       <div className={`${headerColorClass} text-white p-4`}>
@@ -35,8 +37,15 @@ const BranchCard = ({ item, headerColorClass }) => {
           </div>
           
           <div className="flex flex-col col-span-1 md:col-span-2 lg:col-span-3 border-t pt-3 mt-3">
-            <div className="font-semibold mb-1">ที่อยู่:</div>
-            <div className="pl-2">{item.address}</div>
+            <div className="flex justify-between items-center cursor-pointer" onClick={() => setShowAddress(!showAddress)}>
+              <div className="font-semibold">ที่อยู่:</div>
+              <button className="text-blue-600 text-sm">
+                {showAddress ? 'ซ่อน' : 'แสดง'}
+              </button>
+            </div>
+            {showAddress && (
+              <div className="pl-2 mt-1">{item.address}</div>
+            )}
           </div>
         </div>
       </div>
