@@ -1,0 +1,22 @@
+[
+  {
+    "id": "dashboard",
+    "name": "แดชบอร์ด",
+    "icon": "📊"
+  },
+  {
+    "id": "branches",
+    "name": "ข้อมูลสาขา",
+    "icon": "🏢"
+  },
+  {
+    "id": "deliya",
+    "name": "Deliya",
+    "icon": "☕"
+  },
+  {
+    "id": "saboten",
+    "name": "Saboten",
+    "icon": "🍲"
+  }
+]

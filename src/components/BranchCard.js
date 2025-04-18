@@ -1,66 +1,176 @@
+"use client"
+
 import React, { useState } from 'react';
 
-const BranchCard = ({ item, headerColorClass }) => {
-  const [showAddress, setShowAddress] = useState(false);
+const BranchCard = ({ item, headerColorClass, onUpdate, onDelete }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedItem, setEditedItem] = useState({ ...item });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setEditedItem({ ...editedItem, [name]: value });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onUpdate(editedItem);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setEditedItem({ ...item });
+    setIsEditing(false);
+  };
 
   return (
-    <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow">
-      <div className={`${headerColorClass} text-white p-4`}>
+    <div className="bg-white rounded-lg shadow-md overflow-hidden">
+      {/* ส่วนหัวการ์ด */}
+      <div className={`${headerColorClass} text-white p-4 flex justify-between items-center`}>
         <h2 className="text-xl font-bold">{item.name}</h2>
+        <div className="flex space-x-2">
+          <button 
+            onClick={() => setIsEditing(!isEditing)} 
+            className="bg-white text-gray-800 rounded px-3 py-1 text-sm"
+          >
+            {isEditing ? 'ยกเลิก' : 'แก้ไข'}
+          </button>
+          {!isEditing && (
+            <button 
+              onClick={() => {
+                if (window.confirm('คุณต้องการลบข้อมูลนี้ใช่หรือไม่?')) {
+                  onDelete();
+                }
+              }} 
+              className="bg-red-600 text-white rounded px-3 py-1 text-sm"
+            >
+              ลบ
+            </button>
+          )}
+        </div>
       </div>
-      
+
+      {/* เนื้อหาการ์ด */}
       <div className="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-          <div className="flex flex-col">
-            <div className="font-semibold mb-1">รหัสสาขา:</div>
-            <div className="pl-2">{item.id}</div>
-          </div>
-          
-          <div className="flex flex-col">
-            <div className="font-semibold mb-1">เบอร์โทรสาขา:</div>
-            <div className="pl-2">{item.phone}</div>
-          </div>
-          
-          <div className="flex flex-col">
-            <div className="font-semibold mb-1">หัวหน้าสาขา:</div>
-            <div className="pl-2">{item.manager}</div>
-          </div>
-          
-          <div className="flex flex-col">
-            <div className="font-semibold mb-1">เบอร์หัวหน้าสาขา:</div>
-            <div className="pl-2">{item.managerPhone}</div>
-          </div>
-          
-          <div className="flex flex-col">
-            <div className="font-semibold mb-1">รหัสอินเทอร์เน็ต:</div>
-            <div className="pl-2">{item.internetId}</div>
-          </div>
-          
-          <div className="flex flex-col col-span-1 md:col-span-2 lg:col-span-3 border-t pt-3 mt-3">
-            <div className="flex justify-between items-center cursor-pointer" onClick={() => setShowAddress(!showAddress)}>
-              <div className="font-semibold">ที่อยู่:</div>
-              <button className="text-blue-600 text-sm">
-                {showAddress ? 'ซ่อน' : 'แสดง'}
+        {isEditing ? (
+          <form onSubmit={handleSubmit}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700">รหัส</label>
+                <input
+                  type="text"
+                  name="id"
+                  value={editedItem.id}
+                  onChange={handleChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  disabled
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">ชื่อสาขา</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={editedItem.name}
+                  onChange={handleChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">เบอร์โทรศัพท์</label>
+                <input
+                  type="text"
+                  name="phone"
+                  value={editedItem.phone}
+                  onChange={handleChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">ผู้จัดการ</label>
+                <input
+                  type="text"
+                  name="manager"
+                  value={editedItem.manager}
+                  onChange={handleChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">เบอร์ผู้จัดการ</label>
+                <input
+                  type="text"
+                  name="managerPhone"
+                  value={editedItem.managerPhone}
+                  onChange={handleChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700">รหัสอินเตอร์เน็ต</label>
+                <input
+                  type="text"
+                  name="internetId"
+                  value={editedItem.internetId}
+                  onChange={handleChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                />
+              </div>
+              <div className="md:col-span-2">
+                <label className="block text-sm font-medium text-gray-700">ที่อยู่</label>
+                <textarea
+                  name="address"
+                  value={editedItem.address}
+                  onChange={handleChange}
+                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  rows="2"
+                />
+              </div>
+            </div>
+            <div className="mt-4 flex justify-end space-x-2">
+              <button 
+                type="button" 
+                onClick={handleCancel}
+                className="bg-gray-300 text-gray-800 px-4 py-2 rounded"
+              >
+                ยกเลิก
+              </button>
+              <button 
+                type="submit" 
+                className="bg-blue-500 text-white px-4 py-2 rounded"
+              >
+                บันทึก
               </button>
             </div>
-            {showAddress && (
-              <div className="pl-2 mt-1">{item.address}</div>
-            )}
+          </form>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <p className="text-gray-500 text-sm">รหัส</p>
+              <p className="font-medium">{item.id}</p>
+            </div>
+            <div>
+              <p className="text-gray-500 text-sm">เบอร์โทรศัพท์</p>
+              <p className="font-medium">{item.phone}</p>
+            </div>
+            <div>
+              <p className="text-gray-500 text-sm">ผู้จัดการ</p>
+              <p className="font-medium">{item.manager}</p>
+            </div>
+            <div>
+              <p className="text-gray-500 text-sm">เบอร์ผู้จัดการ</p>
+              <p className="font-medium">{item.managerPhone}</p>
+            </div>
+            <div>
+              <p className="text-gray-500 text-sm">รหัสอินเตอร์เน็ต</p>
+              <p className="font-medium">{item.internetId}</p>
+            </div>
+            <div className="md:col-span-2">
+              <p className="text-gray-500 text-sm">ที่อยู่</p>
+              <p className="font-medium">{item.address}</p>
+            </div>
           </div>
-        </div>
-      </div>
-      
-      {/* ส่วนแสดงสถานะและปุ่มดูแผนที่ */}
-      <div className="p-4 bg-gray-50 border-t">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
-            <span className="text-sm text-gray-600">เปิดทำการ</span>
-          </div>
-          <button className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
-            ดูแผนที่
-          </button>
-        </div>
+        )}
       </div>
     </div>
   );
