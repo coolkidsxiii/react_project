@@ -2,9 +2,25 @@
 
 import React, { useState } from 'react';
 
-const BranchCard = ({ item, headerColorClass, onUpdate, onDelete }) => {
+const BranchCard = ({ item, headerColorClass, onUpdate, onDelete, cardType }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedItem, setEditedItem] = useState({ ...item });
+
+  // กำหนดหัวข้อตามประเภทของการ์ด
+  const getManagerLabel = () => {
+    switch (cardType) {
+      case 'branches':
+        return 'หัวหน้าสาขา';
+      case 'deliya':
+        return 'พนักงานหน้าร้าน';
+      case 'saboten':
+        return 'ผู้จัดการ';
+      default:
+        return 'ผู้จัดการ';
+    }
+  };
+
+  const managerLabel = getManagerLabel();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -61,7 +77,7 @@ const BranchCard = ({ item, headerColorClass, onUpdate, onDelete }) => {
                   name="id"
                   value={editedItem.id}
                   onChange={handleChange}
-                  className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
+                  className="mt-1 block w-full border border-black-300 rounded-md shadow-sm p-2"
                   disabled
                 />
               </div>
@@ -87,7 +103,7 @@ const BranchCard = ({ item, headerColorClass, onUpdate, onDelete }) => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">ผู้จัดการ</label>
+                <label className="block text-sm font-medium text-gray-700">{managerLabel}</label>
                 <input
                   type="text"
                   name="manager"
@@ -97,7 +113,7 @@ const BranchCard = ({ item, headerColorClass, onUpdate, onDelete }) => {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700">เบอร์ผู้จัดการ</label>
+                <label className="block text-sm font-medium text-gray-700">เบอร์{managerLabel}</label>
                 <input
                   type="text"
                   name="managerPhone"
@@ -146,27 +162,27 @@ const BranchCard = ({ item, headerColorClass, onUpdate, onDelete }) => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <p className="text-gray-500 text-sm">รหัส</p>
+              <p className="text-gray-500 text-sm font-bold">รหัส</p>
               <p className="font-medium">{item.id}</p>
             </div>
             <div>
-              <p className="text-gray-500 text-sm">เบอร์โทรศัพท์</p>
+              <p className="text-gray-500 text-sm font-bold">เบอร์โทรศัพท์</p>
               <p className="font-medium">{item.phone}</p>
             </div>
             <div>
-              <p className="text-gray-500 text-sm">ผู้จัดการ</p>
+              <p className="text-gray-500 text-sm font-bold">{managerLabel}</p>
               <p className="font-medium">{item.manager}</p>
             </div>
             <div>
-              <p className="text-gray-500 text-sm">เบอร์ผู้จัดการ</p>
+              <p className="text-gray-500 text-sm font-bold">เบอร์{managerLabel}</p>
               <p className="font-medium">{item.managerPhone}</p>
             </div>
             <div>
-              <p className="text-gray-500 text-sm">รหัสอินเตอร์เน็ต</p>
+              <p className="text-gray-500 text-sm font-bold">รหัสอินเตอร์เน็ต</p>
               <p className="font-medium">{item.internetId}</p>
             </div>
             <div className="md:col-span-2">
-              <p className="text-gray-500 text-sm">ที่อยู่</p>
+              <p className="text-gray-500 text-sm font-bold">ที่อยู่</p>
               <p className="font-medium">{item.address}</p>
             </div>
           </div>

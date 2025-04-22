@@ -260,6 +260,7 @@ const BranchInfoCardApp = () => {
             headerColorClass={getHeaderColorClass()}
             onUpdate={(updatedItem) => updateItem(item.id, updatedItem)}
             onDelete={() => deleteItem(item.id)}
+            cardType={activeMenu} // ส่งชนิดของการ์ดไปด้วย
           />
         ))}
       </div>
