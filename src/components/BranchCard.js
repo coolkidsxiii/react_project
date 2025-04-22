@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 const BranchCard = ({ item, headerColorClass, onUpdate, onDelete, cardType }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedItem, setEditedItem] = useState({ ...item });
+  const [showAddress, setShowAddress] = useState(false); // ตั้งค่าเริ่มต้นเป็น false เพื่อซ่อน
 
   // กำหนดหัวข้อตามประเภทของการ์ด
   const getManagerLabel = () => {
@@ -36,6 +37,10 @@ const BranchCard = ({ item, headerColorClass, onUpdate, onDelete, cardType }) =>
   const handleCancel = () => {
     setEditedItem({ ...item });
     setIsEditing(false);
+  };
+
+  const toggleAddressVisibility = () => {
+    setShowAddress(!showAddress);
   };
 
   return (
@@ -133,7 +138,9 @@ const BranchCard = ({ item, headerColorClass, onUpdate, onDelete, cardType }) =>
                 />
               </div>
               <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-gray-700">ที่อยู่</label>
+                <div className="flex justify-between items-center">
+                  <label className="block text-sm font-medium text-gray-700">ที่อยู่</label>
+                </div>
                 <textarea
                   name="address"
                   value={editedItem.address}
@@ -181,9 +188,23 @@ const BranchCard = ({ item, headerColorClass, onUpdate, onDelete, cardType }) =>
               <p className="text-gray-500 text-sm font-bold">รหัสอินเตอร์เน็ต</p>
               <p className="font-medium">{item.internetId}</p>
             </div>
-            <div className="md:col-span-2">
-              <p className="text-gray-500 text-sm font-bold">ที่อยู่</p>
-              <p className="font-medium">{item.address}</p>
+            
+            {/* ปุ่มเปิด-ปิดส่วนที่อยู่ */}
+            <div className="md:col-span-2 mt-2">
+              <button 
+                onClick={toggleAddressVisibility} 
+                className="text-blue-500 text-sm hover:underline focus:outline-none flex items-center"
+              >
+                {showAddress ? '▼ ซ่อนที่อยู่' : '► แสดงที่อยู่'}
+              </button>
+              
+              {/* ส่วนแสดงที่อยู่ */}
+              {showAddress && (
+                <div className="mt-2">
+                  <p className="text-gray-500 text-sm font-bold">ที่อยู่</p>
+                  <p className="font-medium">{item.address}</p>
+                </div>
+              )}
             </div>
           </div>
         )}
