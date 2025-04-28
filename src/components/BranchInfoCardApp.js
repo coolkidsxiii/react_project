@@ -40,7 +40,7 @@ const BranchInfoCardApp = () => {
     address: ''
   });
 
-  // URL ของ backend API (ปรับให้ตรงกับที่คุณใช้)
+  /*// URL ของ backend API (ปรับให้ตรงกับที่คุณใช้)
   const API_URL = 'http://localhost:3001/api';
 
   // ฟังก์ชันสำหรับดึงข้อมูลจาก API
@@ -77,7 +77,7 @@ const BranchInfoCardApp = () => {
     };
 
     fetchAllData();
-  }, []);
+  }, []);*/
 
   // ฟังก์ชันสำหรับเลือกข้อมูลที่จะแสดงตามเมนูที่เลือก และเรียงตามรหัส
 const getDataForActiveMenu = () => {
