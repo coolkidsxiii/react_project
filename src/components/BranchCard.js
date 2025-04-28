@@ -1,11 +1,14 @@
 "use client"
 
 import React, { useState } from 'react';
+import PasswordModal from './PasswordModal';
 
 const BranchCard = ({ item, headerColorClass, onUpdate, onDelete, cardType }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [editedItem, setEditedItem] = useState({ ...item });
-  const [showAddress, setShowAddress] = useState(false); // ตั้งค่าเริ่มต้นเป็น false เพื่อซ่อน
+  const [showAddress, setShowAddress] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [passwordAction, setPasswordAction] = useState(null); // 'edit' หรือ 'delete'
 
   // กำหนดหัวข้อตามประเภทของการ์ด
   const getManagerLabel = () => {
@@ -43,6 +46,26 @@ const BranchCard = ({ item, headerColorClass, onUpdate, onDelete, cardType }) =>
     setShowAddress(!showAddress);
   };
 
+  // เปิด modal และกำหนด action
+  const handleEditClick = () => {
+    setPasswordAction('edit');
+    setShowPasswordModal(true);
+  };
+
+  const handleDeleteClick = () => {
+    setPasswordAction('delete');
+    setShowPasswordModal(true);
+  };
+
+  // เมื่อยืนยันรหัสผ่านสำเร็จ
+  const handlePasswordConfirm = () => {
+    if (passwordAction === 'edit') {
+      setIsEditing(true);
+    } else if (passwordAction === 'delete') {
+      onDelete();
+    }
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden">
       {/* ส่วนหัวการ์ด */}
@@ -50,18 +73,14 @@ const BranchCard = ({ item, headerColorClass, onUpdate, onDelete, cardType }) =>
         <h2 className="text-xl font-bold">{item.name}</h2>
         <div className="flex space-x-2">
           <button 
-            onClick={() => setIsEditing(!isEditing)} 
+            onClick={isEditing ? handleCancel : handleEditClick} 
             className="bg-white text-gray-800 rounded px-3 py-1 text-sm"
           >
             {isEditing ? 'ยกเลิก' : 'แก้ไข'}
           </button>
           {!isEditing && (
             <button 
-              onClick={() => {
-                if (window.confirm('คุณต้องการลบข้อมูลนี้ใช่หรือไม่?')) {
-                  onDelete();
-                }
-              }} 
+              onClick={handleDeleteClick} 
               className="bg-red-600 text-white rounded px-3 py-1 text-sm"
             >
               ลบ
@@ -209,6 +228,14 @@ const BranchCard = ({ item, headerColorClass, onUpdate, onDelete, cardType }) =>
           </div>
         )}
       </div>
+
+      {/* Password Modal */}
+      <PasswordModal 
+        isOpen={showPasswordModal}
+        onClose={() => setShowPasswordModal(false)}
+        onConfirm={handlePasswordConfirm}
+        actionType={passwordAction}
+      />
     </div>
   );
 };

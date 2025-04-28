@@ -4,7 +4,7 @@ const path = require('path');
 const cors = require('cors');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors());
@@ -26,7 +26,7 @@ const initializeDataFile = (filename, initialData) => {
 };
 
 // ข้อมูลเริ่มต้น
-const branchesData = [
+/*const branchesData = [
   {
     id: '1101',
     name: 'ศรีนครินทร์',
@@ -127,7 +127,7 @@ const menuItems = [
 initializeDataFile('branches', branchesData);
 initializeDataFile('deliya', deliyaData);
 initializeDataFile('saboten', sabotenData);
-initializeDataFile('menu', menuItems);
+initializeDataFile('menu', menuItems);*/
 
 // Helper functions
 const readDataFile = (filename) => {
