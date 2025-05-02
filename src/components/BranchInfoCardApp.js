@@ -15,6 +15,8 @@ const BranchInfoCardApp = () => {
   const [activeMenu, setActiveMenu] = useState('branches');
   // State สำหรับการแสดง/ซ่อน sidebar บนมือถือ
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  // State สำหรับตรวจสอบ Dark Mode
+  const [isDarkMode, setIsDarkMode] = useState(false);
   
   // State สำหรับ modal รหัสผ่าน
   const [showPasswordModal, setShowPasswordModal] = useState(false);
@@ -39,6 +41,24 @@ const BranchInfoCardApp = () => {
     internetId: '', 
     address: ''
   });
+
+  // ตรวจสอบโหมดของเบราว์เซอร์เมื่อ component mount
+  useEffect(() => {
+    // ตรวจสอบว่าเบราว์เซอร์อยู่ในโหมดมืดหรือไม่
+    const checkDarkMode = () => {
+      const isDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setIsDarkMode(isDark);
+    };
+    
+    checkDarkMode();
+    
+    // เพิ่ม event listener สำหรับการเปลี่ยนแปลงโหมด
+    const darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    if (darkModeMediaQuery?.addEventListener) {
+      darkModeMediaQuery.addEventListener('change', checkDarkMode);
+      return () => darkModeMediaQuery.removeEventListener('change', checkDarkMode);
+    }
+  }, []);
 
   // URL ของ backend API (ปรับให้ตรงกับที่คุณใช้)
   const API_URL = '/api';
@@ -80,31 +100,31 @@ const BranchInfoCardApp = () => {
   }, []);
 
   // ฟังก์ชันสำหรับเลือกข้อมูลที่จะแสดงตามเมนูที่เลือก และเรียงตามรหัส
-const getDataForActiveMenu = () => {
-  let data;
-  switch(activeMenu) {
-    case 'branches':
-      data = [...branchesData];
-      break;
-    case 'deliya':
-      data = [...deliyaData];
-      break;
-    case 'saboten':
-      data = [...sabotenData];
-      break;
-    default:
-      data = [];
-  }
-  
-  // เรียงลำดับข้อมูลตามรหัส (ID)
-  return data.sort((a, b) => {
-    // แปลงรหัสเป็นตัวเลขเพื่อการเรียงลำดับที่ถูกต้อง
-    // ตัดตัวอักษรออกและแปลงเป็นตัวเลข
-    const idA = parseInt(a.id.replace(/\D/g, '') || '0');
-    const idB = parseInt(b.id.replace(/\D/g, '') || '0');
-    return idA - idB; // เรียงจากน้อยไปมาก
-  });
-};
+  const getDataForActiveMenu = () => {
+    let data;
+    switch(activeMenu) {
+      case 'branches':
+        data = [...branchesData];
+        break;
+      case 'deliya':
+        data = [...deliyaData];
+        break;
+      case 'saboten':
+        data = [...sabotenData];
+        break;
+      default:
+        data = [];
+    }
+    
+    // เรียงลำดับข้อมูลตามรหัส (ID)
+    return data.sort((a, b) => {
+      // แปลงรหัสเป็นตัวเลขเพื่อการเรียงลำดับที่ถูกต้อง
+      // ตัดตัวอักษรออกและแปลงเป็นตัวเลข
+      const idA = parseInt(a.id.replace(/\D/g, '') || '0');
+      const idB = parseInt(b.id.replace(/\D/g, '') || '0');
+      return idA - idB; // เรียงจากน้อยไปมาก
+    });
+  };
 
   // กรองข้อมูลตามคำค้นหา
   const filteredData = getDataForActiveMenu().filter(item => {
@@ -252,6 +272,13 @@ const getDataForActiveMenu = () => {
     setNewItem({ ...newItem, [name]: value });
   };
 
+  // สร้าง CSS classes สำหรับ Dark Mode
+  const bgClass = isDarkMode ? 'bg-gray-900' : 'bg-gray-100';
+  const textClass = isDarkMode ? 'text-white' : 'text-gray-800';
+  const cardBgClass = isDarkMode ? 'bg-gray-800' : 'bg-white';
+  const inputClass = isDarkMode ? 'bg-gray-700 border-gray-600 text-white' : 'bg-white border-gray-300 text-black';
+  const labelClass = isDarkMode ? 'text-gray-300' : 'text-gray-700';
+
   // ฟังก์ชันสำหรับแสดงเนื้อหาตามเมนูที่เลือก
   const renderContent = () => {
     // แสดง loading state
@@ -266,7 +293,7 @@ const getDataForActiveMenu = () => {
     // แสดงข้อความ error
     if (error) {
       return (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div className={`bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded`}>
           <p>{error}</p>
           <button 
             className="mt-2 bg-red-500 hover:bg-red-600 text-white py-1 px-3 rounded" 
@@ -288,6 +315,7 @@ const getDataForActiveMenu = () => {
               searchTerm={searchTerm} 
               setSearchTerm={setSearchTerm} 
               activeMenu={activeMenu} 
+              isDarkMode={isDarkMode}
             />
             
             {/* ปุ่มเพิ่มข้อมูลใหม่ */}
@@ -309,6 +337,7 @@ const getDataForActiveMenu = () => {
             branchesCount={branchesData.length} 
             deliyaCount={deliyaData.length} 
             sabotenCount={sabotenData.length} 
+            isDarkMode={isDarkMode}
           />
         );
       default:
@@ -320,7 +349,7 @@ const getDataForActiveMenu = () => {
   const renderCards = (data) => {
     if (data.length === 0) {
       return (
-        <div className="py-8 text-center text-gray-500">
+        <div className={`py-8 text-center ${isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
           ไม่พบข้อมูลที่ตรงกับการค้นหา
         </div>
       );
@@ -357,7 +386,7 @@ const getDataForActiveMenu = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className={`min-h-screen ${bgClass}`}>
       {/* Overlay for mobile sidebar */}
       <div 
         className={`fixed inset-0 bg-black bg-opacity-50 z-40 ${sidebarOpen ? 'block' : 'hidden'}`} 
@@ -371,121 +400,142 @@ const getDataForActiveMenu = () => {
           activeMenu={activeMenu} 
           setActiveMenu={setActiveMenu} 
           setSidebarOpen={setSidebarOpen} 
+          isDarkMode={isDarkMode} 
         />
       )}
 
-      {/* ส่วนของเนื้อหาหลัก */}
-      <div className="md:ml-64">
+      <div className="flex flex-col min-h-screen">
         <Header 
-          setSidebarOpen={setSidebarOpen} 
-          activeMenu={activeMenu} 
-          menuItems={menuItems} 
+          toggleSidebar={() => setSidebarOpen(!sidebarOpen)} 
+          title={activeMenu === 'branches' ? 'ข้อมูลสาขา' : 
+                activeMenu === 'deliya' ? 'ข้อมูลร้าน Deliya' : 
+                activeMenu === 'saboten' ? 'ข้อมูลร้าน Saboten' : 
+                'แดชบอร์ด'} 
+          isDarkMode={isDarkMode}
         />
-
-        {/* เนื้อหา */}
-        <main className="p-4 sm:px-6 lg:px-8">
-          {renderContent()}
-        </main>
+        
+        <div className="flex-grow p-4 md:ml-64 transition-all duration-300">
+          <div className="container mx-auto">
+            {renderContent()}
+          </div>
+        </div>
       </div>
-
-      {/* Modal เพิ่มข้อมูลใหม่ */}
+      
+      {/* Modal สำหรับยืนยันรหัสผ่าน */}
+      <PasswordModal 
+        isOpen={showPasswordModal} 
+        onClose={() => setShowPasswordModal(false)} 
+        onConfirm={handlePasswordConfirm}
+        isDarkMode={isDarkMode}
+      />
+      
+      {/* Modal สำหรับเพิ่มข้อมูลใหม่ */}
       {showAddModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-2xl mx-4">
-            <h2 className="text-xl font-bold mb-4">เพิ่มข้อมูลใหม่</h2>
+          <div className={`${cardBgClass} p-4 rounded-lg shadow-lg w-full max-w-md mx-4`}>
+            <h2 className={`text-lg font-semibold mb-4 ${textClass}`}>
+              เพิ่มข้อมูลใหม่
+            </h2>
             
             <form onSubmit={(e) => {
               e.preventDefault();
               addItem();
             }}>
-
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* เพิ่มช่องรหัส (ID) ตรงนี้ */}
-            <div>
-            <label className="block text-sm font-medium text-gray-700">รหัส</label>
-            <input
-              type="text"
-              name="id"
-              value={newItem.id}
-              onChange={handleNewItemChange}
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-              required
-            />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">ชื่อ{activeMenu === 'branches' ? 'สาขา' : 'ร้าน'}</label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={newItem.name}
-                    onChange={handleNewItemChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">เบอร์โทรศัพท์</label>
-                  <input
-                    type="text"
-                    name="phone"
-                    value={newItem.phone}
-                    onChange={handleNewItemChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">{getManagerLabel()}</label>
-                  <input
-                    type="text"
-                    name="manager"
-                    value={newItem.manager}
-                    onChange={handleNewItemChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">เบอร์{getManagerLabel()}</label>
-                  <input
-                    type="text"
-                    name="managerPhone"
-                    value={newItem.managerPhone}
-                    onChange={handleNewItemChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">รหัสอินเตอร์เน็ต</label>
-                  <input
-                    type="text"
-                    name="internetId"
-                    value={newItem.internetId}
-                    onChange={handleNewItemChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                  />
-                </div>
-                <div className="md:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700">ที่อยู่</label>
-                  <textarea
-                    name="address"
-                    value={newItem.address}
-                    onChange={handleNewItemChange}
-                    className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"
-                    rows="2"
-                  />
-                </div>
+              <div className="mb-4">
+                <label className={`block mb-1 ${labelClass}`} htmlFor="id">รหัส</label>
+                <input
+                  id="id"
+                  name="id"
+                  value={newItem.id}
+                  onChange={handleNewItemChange}
+                  className={`w-full px-3 py-2 border rounded-md ${inputClass}`}
+                  required
+                />
               </div>
               
-              <div className="mt-4 flex justify-end space-x-2">
+              <div className="mb-4">
+                <label className={`block mb-1 ${labelClass}`} htmlFor="name">ชื่อสาขา/ร้าน</label>
+                <input
+                  id="name"
+                  name="name"
+                  value={newItem.name}
+                  onChange={handleNewItemChange}
+                  className={`w-full px-3 py-2 border rounded-md ${inputClass}`}
+                  required
+                />
+              </div>
+              
+              <div className="mb-4">
+                <label className={`block mb-1 ${labelClass}`} htmlFor="phone">เบอร์โทรศัพท์</label>
+                <input
+                  id="phone"
+                  name="phone"
+                  value={newItem.phone}
+                  onChange={handleNewItemChange}
+                  className={`w-full px-3 py-2 border rounded-md ${inputClass}`}
+                  required
+                />
+              </div>
+              
+              <div className="mb-4">
+                <label className={`block mb-1 ${labelClass}`} htmlFor="manager">{getManagerLabel()}</label>
+                <input
+                  id="manager"
+                  name="manager"
+                  value={newItem.manager}
+                  onChange={handleNewItemChange}
+                  className={`w-full px-3 py-2 border rounded-md ${inputClass}`}
+                  required
+                />
+              </div>
+              
+              <div className="mb-4">
+                <label className={`block mb-1 ${labelClass}`} htmlFor="managerPhone">เบอร์{getManagerLabel()}</label>
+                <input
+                  id="managerPhone"
+                  name="managerPhone"
+                  value={newItem.managerPhone}
+                  onChange={handleNewItemChange}
+                  className={`w-full px-3 py-2 border rounded-md ${inputClass}`}
+                  required
+                />
+              </div>
+              
+              <div className="mb-4">
+                <label className={`block mb-1 ${labelClass}`} htmlFor="internetId">รหัสอินเทอร์เน็ต</label>
+                <input
+                  id="internetId"
+                  name="internetId"
+                  value={newItem.internetId}
+                  onChange={handleNewItemChange}
+                  className={`w-full px-3 py-2 border rounded-md ${inputClass}`}
+                />
+              </div>
+              
+              <div className="mb-4">
+                <label className={`block mb-1 ${labelClass}`} htmlFor="address">ที่อยู่</label>
+                <textarea
+                  id="address"
+                  name="address"
+                  value={newItem.address}
+                  onChange={handleNewItemChange}
+                  className={`w-full px-3 py-2 border rounded-md ${inputClass}`}
+                  rows="3"
+                  required
+                ></textarea>
+              </div>
+              
+              <div className="flex justify-end space-x-3">
                 <button
                   type="button"
                   onClick={() => setShowAddModal(false)}
-                  className="bg-gray-300 text-gray-800 px-4 py-2 rounded"
+                  className="px-4 py-2 rounded-md bg-gray-500 hover:bg-gray-600 text-white"
                 >
                   ยกเลิก
                 </button>
                 <button
                   type="submit"
-                  className="bg-green-500 text-white px-4 py-2 rounded"
+                  className="px-4 py-2 rounded-md bg-green-500 hover:bg-green-600 text-white"
                 >
                   บันทึก
                 </button>
@@ -494,14 +544,6 @@ const getDataForActiveMenu = () => {
           </div>
         </div>
       )}
-
-      {/* Modal ยืนยันรหัสผ่าน */}
-      <PasswordModal 
-        isOpen={showPasswordModal}
-        onClose={() => setShowPasswordModal(false)}
-        onConfirm={handlePasswordConfirm}
-        actionType={passwordAction}
-      />
     </div>
   );
 };
